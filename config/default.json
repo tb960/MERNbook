@@ -1,4 +1,3 @@
-  
 {
     "mongoURI": "mongodb+srv://tbk_96:00001123734703@cluster0.viei9.mongodb.net/<dbname>?retryWrites=true&w=majority",
     "jsonWebTokenSecret": "helloWorld"
