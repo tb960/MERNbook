@@ -4,6 +4,8 @@ const { check, validationResult } = require("express-validator");
 let User = require('../schemas/User');
 const bcryptjs = require('bcryptjs');
 const gravatar = require('gravatar');
+const config = require('config');
+const jwt = require('jsonwebtoken');
 
 
 router.post('/register', 
@@ -17,7 +19,9 @@ router.post('/register',
     async(req,  res) =>{
     try{
         let { name,lastName,userName,email,password } = req.body;
-        let user = await User.findOne({ email }).select("password");
+        //this line search through the database and search whether the email exist in the database or not
+        let user = await User.findOne({ email }).select("-password");
+        let fetchedUserNameFromDatabase = await User.findOne({ userName }).select("-password");
         let errors = validationResult(req);
 
         if(!errors.isEmpty()){
@@ -26,6 +30,10 @@ router.post('/register',
         if(user){
             return res.status(401).send("User has already been created!");
         }
+        
+        if(fetchedUserNameFromDatabase){
+            return res.status(401).send("User name has already been taken!");
+        }
 
         const avatar = gravatar.url(email,{
             r: 'pg',
@@ -33,6 +41,7 @@ router.post('/register',
             s: '200',
         });
 
+        //this one is to turn all the user into an json object to pass into the database
         let newUser = new User({
             name,
             lastName,
@@ -50,7 +59,21 @@ router.post('/register',
 
         await newUser.save();
 
-        res.send("user registered!");
+        const payload = {
+            user: {
+                id: newUser._id,
+            },
+        };
+
+        jwt.sign(
+            payload,
+            config.get("jsonWebTokenSecret"), 
+            {expiresIn: 3600}, 
+            (err, token) =>{
+                if(err) throw err;
+                res.json({ token });
+            }
+        );
     }
     catch(error){
         console.log(error.message);
