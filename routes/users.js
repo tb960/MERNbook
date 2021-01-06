@@ -106,6 +106,8 @@ router.post('/login',
             return res.status(401).send("Password do not match");
         }
 
+        console.log("user signed in");
+
         const payload = {
             user: {
                 id: user._id,
