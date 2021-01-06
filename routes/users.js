@@ -79,6 +79,55 @@ router.post('/register',
         console.log(error.message);
         return res.statusCode(500).send("Server error.");
     }
+});
+
+router.post('/login', 
+    [
+        check('email', 'E-mail is empty').isEmail(),
+        check('password','Passwords needs to contain 6 letters and less than 12').isLength({min: 6, max: 12})
+    ],
+    async(req,  res) =>{
+    try{
+        let { email,password } = req.body;
+        //this line search through the database and search whether the email exist in the database or not
+        let user = await User.findOne({ email }).select("password");
+        let errors = validationResult(req);
+
+        if(!errors.isEmpty()){
+            return res.status(400).json({ errors: errors.array() });
+        }
+        if(!user){
+            return res.status(404).send("User with this email has not been created!");
+        }
+
+        let doPasswordMatch = await bcryptjs.compare(password, user.password);
+
+        if(!doPasswordMatch){
+            return res.status(401).send("Password do not match");
+        }
+
+        const payload = {
+            user: {
+                id: user._id,
+            },
+        };
+
+        jwt.sign(
+            payload,
+            config.get("jsonWebTokenSecret"), 
+            {expiresIn: 3600}, 
+            (err, token) =>{
+                if(err) throw err;
+                res.json({ token });
+            }
+        );
+    }
+    catch(error){
+        console.log(error.message);
+        return res.status(500).send("Server error.");
+    }
 })
+
+
 
 module.exports = router
