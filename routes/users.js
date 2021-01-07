@@ -6,7 +6,25 @@ const bcryptjs = require('bcryptjs');
 const gravatar = require('gravatar');
 const config = require('config');
 const jwt = require('jsonwebtoken');
+const authentication = require("../middleware/authentication.js");
 
+
+//this authentication middleware is such that, whenever the user sign up, we will create a jsonwebToken for the user
+//and then everytime when user try to sign in and want to access to their data we will use this jsonWebToken provided to verify the user
+//we also use this token to find the user in the database
+//for example, user A sign up, we will give them a token, then we will need to store the token in the database
+//and then whenever the user try to get to the "/" route, the user need to provide their web token 
+//and we will use this decoded file to look for the user details in the database, only the user detail should return to api request
+router.get("/", authentication, async(req,res)=>{
+    try{
+        let user = await User.findById(req.user.id).select("-password");
+        res.json(user);
+    }
+    catch(error){
+        console.error(error.message);
+        return res.status(500).send("Server error...");
+    }
+});
 
 router.post('/register', 
     [
@@ -76,7 +94,7 @@ router.post('/register',
         );
     }
     catch(error){
-        console.log(error.message);
+        console.error(error.message);
         return res.statusCode(500).send("Server error.");
     }
 });
@@ -125,7 +143,7 @@ router.post('/login',
         );
     }
     catch(error){
-        console.log(error.message);
+        console.error(error.message);
         return res.status(500).send("Server error.");
     }
 })
