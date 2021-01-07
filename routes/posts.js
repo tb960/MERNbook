@@ -25,13 +25,45 @@ router.get("/posts/most_liked", async(req,res) =>{
       }
 });
 
-// router.get("/posts/the_most_recent", getPostsByDate);
+router.get("/posts/the_most_recent", async(req,res)=>{
+    try {
+        let posts = await Post.find().sort({ date: -1 });
+        res.json(posts);
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json("Server Error...");
+      }
+});
 
-// router.get("/posts/the_most_commented", getMostCommented);
+router.get("/posts/the_most_commented", async(req,res) =>{
+    try {
+        let posts = await Post.find().sort({ comments: -1 });
+        res.json(posts);
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json("Server Error...");
+      }
+});
 
-// router.get("/single_post/:post_id", getSinglePost);
+router.get("/single_post/:post_id", async(req,res) =>{
+    try {
+        let posts = await Post.findById(req.params.post_id);
+        res.json(posts);
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json("Server Error...");
+      }
+});
 
-// router.get("/user_posts/:user_id", getUserPostsById);
+router.get("/user_posts/:user_id", async(req,res)=>{
+    try {
+        let posts = await Post.find({ user: req.params.user_id });
+        res.json(posts);
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json("Server Error...");
+      }
+});
 
 // router.get("/user_posts", authentication, getUserPostsByMiddleware);
 
