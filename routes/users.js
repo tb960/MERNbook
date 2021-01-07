@@ -26,6 +26,40 @@ router.get("/", authentication, async(req,res)=>{
     }
 });
 
+router.get("/users", async (req,res)=>{
+    try {
+        let users = await User.find().select("-password");
+        res.json(users);
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).send("Server error...");
+    }
+});
+
+router.get("/get_user_by_email/:user_email", async (req,res)=>{
+    try {
+        let userEmail = req.params.user_email;
+        let user = await User.findOne({ email: userEmail}).select("-password");
+        res.json(user);
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).send("Server error...");
+    }
+})
+
+router.get("/get_user_by_id/:user_id", async (req,res)=>{
+    try {
+        let userId = req.params.user_id;
+        let user = await User.findById(userId).select("-password");
+        res.json(user);
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).send("Server error...");
+    }
+})
+
+
+
 router.post('/register', 
     [
         check('name', 'Name is empty').not().isEmpty(),
@@ -148,6 +182,32 @@ router.post('/login',
     }
 })
 
+router.put('/search_username', 
+    [check('searchInput', "Search is empty").not().isEmpty()], 
+    async(req,res) =>{
+        try {
+            let { userNameFromSearch } = req.body;
+
+            let errors = validationResult(req);
+
+            if (!errors.isEmpty())
+            return res.status(400).json({ errors: errors.array() });
+
+            let users = await User.find().select("-password");
+
+            let findUserByUsername = users.filter(
+            (user) =>
+                user.userName.toString().toLowerCase().split(" ").join("") ===
+                userNameFromSearch.toString().toLowerCase().split(" ").join("")
+            );
+            res.json(findUserByUsername);
+
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send("Server error...");
+        }
+
+})
 
 
 module.exports = router
