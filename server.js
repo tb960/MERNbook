@@ -10,7 +10,7 @@ app.use(express.json({extended: false})); //allow us to send body-parser request
 connectToDatabase();
 
 //Routes
-//app.use('/api/posts',require('./routes/posts.js'));
+app.use('/api/posts',require('./routes/posts.js'));
 app.use('/api/users',require('./routes/users.js'));
 
 app.get('/',(req,res) => {
