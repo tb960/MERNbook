@@ -244,5 +244,64 @@ router.put('/change_user_data/:user_data_to_change',
           }
 });
 
+router.put('./check_actual_password',
+    authentication,
+    [
+        check('passwordToCheck','Password had to be 6 letter and below 12').isLength({ min: 6, max: 12})
+    ],
+    async (req,res)=>{
+        try {
+            const { passwordToCheck } = req.body;
+            const errors = validationResult(req);
+            if (!errors.isEmpty())
+            return res.status(400).json({ errors: errors.array() });
+            let user = await User.findById(req.user.id);
+
+            let doPasswordsMatch = await bcryptjs.compare(
+                passwordToCheck,
+                user.password
+            );
+
+            if (!doPasswordsMatch)
+            return res.status(401).json("Passwords do not match");
+
+            res.json("success");
+            
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json("Server Error...");
+        }
+    });
+
+
+router.put('./change_user_password',
+    authentication,
+    [
+        check('newPassword', 'New password should be 6 letter and below 12').isLength({ min: 6, max: 12})
+    ],
+    async (req,res) =>{
+        try {
+            const { newPassword } = req.body;
+            const errors = validationResult(req);
+            if (!errors.isEmpty())
+            return res.status(400).json({ errors: errors.array() });
+            let user = await User.findById(req.user.id);
+
+            const salt = await bcryptjs.genSalt(10);
+
+            const hashedPassword = await bcryptjs.hash(newPassword, salt);
+
+            user.password = hashedPassword;
+
+            await user.save();
+
+            res.json("Success");
+            
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json("Server Error...");
+        }
+    });
+
 
 module.exports = router
