@@ -208,10 +208,11 @@ router.put('/change_user_data',
             res.status(500).send("Server error...");
         }
 
-})
+});
 
-router.put('/search_username', 
-    [check('searchInput', "Search is empty").not().isEmpty()], 
+router.put('/change_user_data/:user_data_to_change', 
+    authentication,
+    [check('changeUserData', "Search is empty").not().isEmpty()], 
     async(req,res) =>{
         try {
             const { changeUserData } = req.body;
@@ -241,7 +242,7 @@ router.put('/search_username',
             console.error(error);
             return res.status(500).json("Server Error...");
           }
-})
+});
 
 
 module.exports = router
