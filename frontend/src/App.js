@@ -16,7 +16,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import store from "./store";
 import { Provider } from "react-redux";
 import setAuthenticationToken from "./middleware/setAuthenticationToken";
-import { userLoaded } from "./actions/auth.actions/userLoaded";
+import { userLoaded } from "./actions/authActions/userLoaded";
 import IsLoggedInRoute from "./routes/IsLoggedInRoute";
 import PrivateRoute from "./routes/PrivateRoute";
 import "./App.css";

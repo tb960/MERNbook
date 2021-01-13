@@ -3,7 +3,7 @@ import {
   AUTH_FORM_SUCCESS,
   AUTH_FORM_FAIL,
 } from "../../constants/authConstants";
-import { userLoaded } from "../auth.actions/userLoaded";
+import { userLoaded } from "../authActions/userLoaded";
 
 export const loginUser = (userData) => async (dispatch) => {
   try {

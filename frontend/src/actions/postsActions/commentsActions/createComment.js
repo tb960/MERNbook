@@ -1,6 +1,6 @@
 import { ADD_COMMENT, POST_ERROR } from "../../../constants/postsConstants";
 import axios from "axios";
-import { getPost } from "../posts.actions/getPost";
+import { getPost } from "../postsActions/getPost";
 
 export const createComment = (textOfTheComment, post_id) => async (
   dispatch
